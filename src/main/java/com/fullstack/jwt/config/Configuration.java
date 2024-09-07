@@ -1,16 +1,23 @@
 package com.fullstack.jwt.config;
 
+import com.fullstack.jwt.service.JwtUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @org.springframework.context.annotation.Configuration
 @EnableWebSecurity
 public class Configuration {
 
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
 //    /**
 //     * Step 1
 //     * Bypass basic security - start
@@ -60,22 +67,52 @@ public class Configuration {
 //    }
 //    /** Add authorization with form login - end */
 
+//    /**
+//     * Step 5
+//     * Get session id when call every time - start
+//     * SessionCreationPolicy.STATELESS - return different session id
+//     * SessionCreationPolicy.ALWAYS - return same session id
+//     * SessionCreationPolicy.NEVER - first & second are different, after second return same session id
+//     * SessionCreationPolicy.IF_REQUIRED - return same session id
+//     */
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity.csrf(customizer -> customizer.disable());
+//        httpSecurity.authorizeHttpRequests(request -> request.anyRequest().authenticated());
+//        httpSecurity.formLogin(Customizer.withDefaults());
+//        httpSecurity.httpBasic(Customizer.withDefaults());
+//        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER));
+//        return httpSecurity.build();
+//    }
+//    /** Add authorization with form login - end */
+
     /**
-     * Step 5
-     * Get session id when call every time - start
-     * SessionCreationPolicy.STATELESS - return different session id
-     * SessionCreationPolicy.ALWAYS - return same session id
-     * SessionCreationPolicy.NEVER - first & second are different, after second return same session id
-     * SessionCreationPolicy.IF_REQUIRED - return same session id
+     * Step 6
+     * User builder pattern - start
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf(customizer -> customizer.disable());
-        httpSecurity.authorizeHttpRequests(request -> request.anyRequest().authenticated());
-        httpSecurity.formLogin(Customizer.withDefaults());
-        httpSecurity.httpBasic(Customizer.withDefaults());
-        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER));
-        return httpSecurity.build();
+        return httpSecurity.
+                csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+                .build();
     }
-    /** Add authorization with form login - end */
+    /** User builder pattern - end */
+
+    /**
+     * Step 6
+     * Log from given user without encode password - start
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setUserDetailsService(jwtUserDetailsService);
+        return provider;
+    }
+
+    /** Log from given user without encode password - end */
 }
