@@ -13,7 +13,7 @@ public class User {
     @Column(name = "user_name")
     private String userName;
     @Column(name = "password")
-    private Integer userPassword;
+    private String userPassword;
 
     public Integer getUserId() {
         return userId;
@@ -31,11 +31,11 @@ public class User {
         this.userName = userName;
     }
 
-    public Integer getUserPassword() {
+    public String getUserPassword() {
         return userPassword;
     }
 
-    public void setUserPassword(Integer userPassword) {
+    public void setUserPassword(String userPassword) {
         this.userPassword = userPassword;
     }
 }

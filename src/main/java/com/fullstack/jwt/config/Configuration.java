@@ -9,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -102,17 +103,31 @@ public class Configuration {
     }
     /** User builder pattern - end */
 
+//    /**
+//     * Step 6
+//     * Log from given user without encode password - start
+//     */
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+//        provider.setUserDetailsService(jwtUserDetailsService);
+//        return provider;
+//    }
+//
+//    /** Log from given user without encode password - end */
+
     /**
-     * Step 6
-     * Log from given user without encode password - start
+     * Step 7
+     * Log from given user with BCrypt password encode - start
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         provider.setUserDetailsService(jwtUserDetailsService);
         return provider;
     }
 
-    /** Log from given user without encode password - end */
+    /** Log from given user with BCrypt password encode - end */
 }
