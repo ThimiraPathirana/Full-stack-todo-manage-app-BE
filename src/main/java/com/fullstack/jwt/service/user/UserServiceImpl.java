@@ -2,6 +2,7 @@ package com.fullstack.jwt.service.user;
 
 import com.fullstack.jwt.model.User;
 import com.fullstack.jwt.repository.UserRepository;
+import com.fullstack.jwt.service.JWTService;
 import com.fullstack.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AuthenticationManager manager;
+
+    @Autowired
+    private JWTService jwtService;
 
     /**
      * When we pass user obj new user will be created
@@ -38,7 +42,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication =
                 manager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(), user.getUserPassword()));
         if (authentication.isAuthenticated())
-            return "Success";
+            return jwtService.generateToken(user);
         return "fail";
     }
 }

@@ -153,11 +153,12 @@ public class Configuration {
     /** User builder pattern - end */
 
     /**
-     * Step 9
-     * Log from given user with BCrypt password encode - start
+     * Step 8
+     * Use AuthenticationManager to verify login user - start
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+    /** Use AuthenticationManager to verify login user - end */
 }
