@@ -10,4 +10,11 @@ public interface UserService {
      * @return created user
      */
     User registerUser(User user);
+
+    /**
+     * Verify the user
+     * @param user
+     * @return
+     */
+    String verify(User user);
 }

@@ -3,9 +3,11 @@ package com.fullstack.jwt.config;
 import com.fullstack.jwt.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -87,21 +89,21 @@ public class Configuration {
 //    }
 //    /** Add authorization with form login - end */
 
-    /**
-     * Step 6
-     * User builder pattern - start
-     */
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.
-                csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
-                .build();
-    }
-    /** User builder pattern - end */
+//    /**
+//     * Step 6
+//     * User builder pattern - start
+//     */
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+//        return httpSecurity.
+//                csrf(customizer -> customizer.disable())
+//                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+//                .formLogin(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+//                .build();
+//    }
+//    /** User builder pattern - end */
 
 //    /**
 //     * Step 6
@@ -130,4 +132,32 @@ public class Configuration {
     }
 
     /** Log from given user with BCrypt password encode - end */
+
+    /**
+     * Step 8
+     * Give access only for 'register,login' api without authenticate - start
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity.
+                csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("register", "login")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+                .build();
+    }
+    /** User builder pattern - end */
+
+    /**
+     * Step 9
+     * Log from given user with BCrypt password encode - start
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
 }
