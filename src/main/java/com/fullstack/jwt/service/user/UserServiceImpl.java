@@ -41,8 +41,9 @@ public class UserServiceImpl implements UserService {
     public String verify(User user) {
         Authentication authentication =
                 manager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(), user.getUserPassword()));
-        if (authentication.isAuthenticated())
-            return jwtService.generateToken(user);
-        return "fail";
+//        if (authentication.isAuthenticated())
+//            return jwtService.generateToken(user);
+//        return "fail";
+        return null;
     }
 }

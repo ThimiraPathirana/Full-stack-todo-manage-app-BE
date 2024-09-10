@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @org.springframework.context.annotation.Configuration
 @EnableWebSecurity
@@ -21,6 +22,10 @@ public class Configuration {
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    private JwtFilter jwtFilter;
+
 //    /**
 //     * Step 1
 //     * Bypass basic security - start
@@ -133,9 +138,38 @@ public class Configuration {
 
     /** Log from given user with BCrypt password encode - end */
 
+//    /**
+//     * Step 8
+//     * Give access only for 'register,login' api without authenticate - start
+//     */
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+//        return httpSecurity.
+//                csrf(customizer -> customizer.disable())
+//                .authorizeHttpRequests(request -> request
+//                        .requestMatchers("register", "login")
+//                        .permitAll()
+//                        .anyRequest().authenticated())
+//                .formLogin(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+//                .build();
+//    }
+//    /** User builder pattern - end */
+
     /**
      * Step 8
-     * Give access only for 'register,login' api without authenticate - start
+     * Use AuthenticationManager to verify login user - start
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+    /** Use AuthenticationManager to verify login user - end */
+
+    /**
+     * Step 9
+     * Verify the generated token for other api - start
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -148,17 +182,8 @@ public class Configuration {
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
     /** User builder pattern - end */
-
-    /**
-     * Step 8
-     * Use AuthenticationManager to verify login user - start
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-    /** Use AuthenticationManager to verify login user - end */
 }
